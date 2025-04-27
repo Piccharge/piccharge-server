@@ -5,8 +5,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 class PicchargeServerApplicationTests {
-
-    @Test
-    void contextLoads() {
-    }
 }
