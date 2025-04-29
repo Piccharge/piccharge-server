@@ -50,56 +50,11 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(firebaseAuthFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
     @Bean
     public FirebaseAuthFilter firebaseAuthFilter() {
         return new FirebaseAuthFilter(firebaseAuth);
-    }
-
-    // OncePerRequestFilter 구현: Authorization 헤더의 Bearer {ID_TOKEN} 검증
-    public static class FirebaseAuthFilter extends OncePerRequestFilter {
-        private final FirebaseAuth firebaseAuth;
-
-        public FirebaseAuthFilter(FirebaseAuth firebaseAuth) {
-            this.firebaseAuth = firebaseAuth;
-        }
-
-        @Override
-        protected void doFilterInternal(HttpServletRequest request,
-                                        HttpServletResponse response,
-                                        FilterChain filterChain)
-                throws ServletException, IOException {
-
-            String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-            if (header != null && header.startsWith("Bearer ")) {
-                String idToken = header.substring(7);
-
-                try {
-                    FirebaseToken decoded = firebaseAuth.verifyIdToken(idToken);
-
-                    CustomUserDetails userDetails = CustomUserDetails.builder()
-                            .uid(decoded.getUid())
-                            .email(decoded.getEmail())
-                            .build();
-
-                    UsernamePasswordAuthenticationToken auth =
-                            new UsernamePasswordAuthenticationToken(
-                                    userDetails,
-                                    null,
-                                    Collections.emptyList()
-                            );
-                    SecurityContextHolder.getContext().setAuthentication(auth);
-
-                } catch (Exception e) {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 검증 실패 시 401 반환
-                    return;
-                }
-            }
-
-            filterChain.doFilter(request, response);
-        }
     }
 }
