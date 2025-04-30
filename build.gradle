@@ -37,9 +37,14 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // test
+    // test - spring
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // test - h2
+    testImplementation 'com.h2database:h2'
+
+    // JUnit5, AssertJ
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // mysql
