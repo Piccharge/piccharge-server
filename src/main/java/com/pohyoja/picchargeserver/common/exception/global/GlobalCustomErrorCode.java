@@ -1,5 +1,7 @@
-package com.pohyoja.picchargeserver.global.exception;
+package com.pohyoja.picchargeserver.common.exception.global;
 
+import com.pohyoja.picchargeserver.common.exception.CustomErrorCode;
+import com.pohyoja.picchargeserver.common.exception.CustomErrorCodeInterface;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;

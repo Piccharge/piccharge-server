@@ -1,4 +1,4 @@
-package com.pohyoja.picchargeserver.config;
+package com.pohyoja.picchargeserver.config.infrastructure;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,9 @@
-package com.pohyoja.picchargeserver.global.exception;
+package com.pohyoja.picchargeserver.common.exception.handler;
 
-import com.pohyoja.picchargeserver.global.BaseResponse;
+import com.pohyoja.picchargeserver.common.BaseResponse;
+import com.pohyoja.picchargeserver.common.exception.CustomErrorCode;
+import com.pohyoja.picchargeserver.common.exception.CustomException;
+import com.pohyoja.picchargeserver.common.exception.global.GlobalCustomErrorCode;
 import jakarta.validation.ConstraintViolationException;
 import java.nio.file.AccessDeniedException;
 import javax.naming.AuthenticationException;

@@ -1,4 +1,4 @@
-package com.pohyoja.picchargeserver.global.exception;
+package com.pohyoja.picchargeserver.common.exception;
 
 public interface CustomErrorCodeInterface {
     CustomErrorCode getErrorCode();

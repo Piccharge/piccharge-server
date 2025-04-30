@@ -1,6 +1,5 @@
-package com.pohyoja.picchargeserver.global;
+package com.pohyoja.picchargeserver.common;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -12,8 +11,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @JsonPropertyOrder({"timeStamp", "code", "message", "result"})
 public class BaseResponse<T> {
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    private final OffsetDateTime timeStamp = LocalDateTime.now().atOffset(ZoneOffset.UTC);
+    private final OffsetDateTime timeStamp = LocalDateTime.now().atOffset(ZoneOffset.UTC).withNano(0);
     private final String code;
     private final String message;
     private T result;

@@ -1,4 +1,4 @@
-package com.pohyoja.picchargeserver.config;
+package com.pohyoja.picchargeserver.config.application;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
