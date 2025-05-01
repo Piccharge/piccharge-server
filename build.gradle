@@ -29,6 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Spring Security Oauth2
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
@@ -55,6 +56,9 @@ dependencies {
 
     // Firebase admin SDK
     implementation 'com.google.firebase:firebase-admin:9.4.3'
+
+    // 외부 라이브러리: 로그에 sql query 파라미터 정보 알려주는 것
+    implementation 'com.github.gavlyukovskiy:datasource-proxy-spring-boot-starter:1.11.0'
 }
 
 tasks.named('test') {
