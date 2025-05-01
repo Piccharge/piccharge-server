@@ -48,12 +48,11 @@ public class Member extends BaseEntity {
     private List<Photo> photos = new ArrayList<>();
 
     @Builder
-    public Member(String uid, String name, String email, Role role, Family family) {
+    public Member(String uid, String name, String email, Role role) {
         this.uid = uid;
         this.name = name;
         this.email = email;
         this.role = role;
-        this.family = family;
     }
 
     public void setFamily(Family family) {
