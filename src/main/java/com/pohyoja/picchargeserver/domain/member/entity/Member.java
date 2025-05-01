@@ -30,9 +30,12 @@ public class Member extends BaseEntity {
     @Id @Column(name = "member_id")
     private String uid;
 
+    @Column(unique = true) // 마이그레이션 이전 로직 유지
     private String name;
 
     private String email;
+
+    private int uploadCycle = 3;
 
     @Enumerated(EnumType.STRING)
     private Role role;
