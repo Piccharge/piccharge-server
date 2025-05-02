@@ -10,6 +10,7 @@ import com.pohyoja.picchargeserver.domain.member.dto.MemberDTO;
 import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
 import com.pohyoja.picchargeserver.domain.member.service.MemberService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "03. 테스트 API", description = "테스트 데이터 생성을 위한 API")
 public class TestController {
 
     private final MemberRepository memberRepository;
