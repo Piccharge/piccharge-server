@@ -30,7 +30,8 @@ public class Photo extends BaseEntity {
     private String url;
 
     @Embedded
-    private Reaction reaction;
+    private Reaction reaction = new Reaction();
+    ;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "family_id")

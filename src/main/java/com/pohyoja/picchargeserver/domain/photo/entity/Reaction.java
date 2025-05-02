@@ -1,13 +1,12 @@
 package com.pohyoja.picchargeserver.domain.photo.entity;
 
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Embeddable
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class Reaction {
     private int loveCount = 0;
     private int fireCount = 0;

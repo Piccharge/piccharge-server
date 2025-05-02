@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,14 +26,14 @@ public class InviteCode extends BaseEntity {
     @Column(name = "invite_code_id")
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 12)
+    @Column(nullable = false, unique = true)
     private String code;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "family_id")
     private Family family;
 
-    private final LocalDateTime expiresAt = LocalDateTime.now().plusHours(1);
+    private final LocalDateTime expiresAt = LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1);
 
     public InviteCode(Family family) {
         this.family = family;

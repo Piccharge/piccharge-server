@@ -2,8 +2,7 @@ package com.pohyoja.picchargeserver.common;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @JsonPropertyOrder({"timeStamp", "code", "message", "result"})
 public class BaseResponse<T> {
-    private final OffsetDateTime timeStamp = LocalDateTime.now().atOffset(ZoneOffset.UTC).withNano(0);
+    private final LocalDateTime timeStamp = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     private final String code;
     private final String message;
     private T result;

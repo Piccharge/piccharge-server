@@ -71,6 +71,7 @@ public class MemberService {
             throw new CustomException(MemberCustomErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
+        name = name.trim();
         // 이름 길이 체크 (2자에서 12자 이내, 한글 기준)
         if (name != null && !name.isEmpty() && (name.length() < 2 || name.length() > 12)) {
             throw new CustomException(MemberCustomErrorCode.INVALID_NAME_LENGTH);
