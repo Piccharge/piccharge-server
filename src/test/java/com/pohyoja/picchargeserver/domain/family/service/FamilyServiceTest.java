@@ -589,7 +589,7 @@ class FamilyServiceTest {
         @DisplayName("존재하지 않는 초대 코드로 조회 시 예외가 발생한다")
         void getFamilyUserNamesByInviteCode_InviteCodeNotFound() {
             // Given
-            String nonExistentCode = "NONEXISTENT";
+            String nonExistentCode = "NONEXI";
 
             // When & Then
             assertThatThrownBy(() -> familyService.getFamilyUserNamesByInviteCode(nonExistentCode))
@@ -733,7 +733,7 @@ class FamilyServiceTest {
         void joinFamilyByInviteCode_InviteCodeNotFound() {
             // Given
             Member member = saveTestMember();
-            String nonExistentCode = "NONEXISTENT";
+            String nonExistentCode = "NONEXI";
 
             // When & Then
             assertThatThrownBy(() -> familyService.joinFamilyByInviteCode(nonExistentCode, member.getUid()))

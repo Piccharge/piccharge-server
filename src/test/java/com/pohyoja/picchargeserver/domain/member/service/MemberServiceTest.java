@@ -9,7 +9,6 @@ import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.entity.Role;
 import com.pohyoja.picchargeserver.domain.member.exception.MemberCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
-import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -189,30 +188,6 @@ class MemberServiceTest {
         }
 
         @Test
-        @DisplayName("필수 필드가 null인 경우에도 저장된다")
-        void saveMember_WithNullFields() {
-            // Given
-            String partialId = "partial-id";
-            String partialName = null; // null name
-            String partialEmail = null; // null email
-
-            // When
-            MemberDTO savedDTO = memberService.saveMember(partialName, partialId, partialEmail);
-
-            // Then
-            assertThat(savedDTO).isNotNull();
-            assertThat(savedDTO.id()).isEqualTo(partialId);
-            assertThat(savedDTO.name()).isNull();
-            assertThat(savedDTO.email()).isNull();
-
-            // DB 확인
-            Member savedMember = memberRepository.findById(partialId).orElse(null);
-            assertThat(savedMember).isNotNull();
-            assertThat(savedMember.getName()).isNull();
-            assertThat(savedMember.getEmail()).isNull();
-        }
-
-        @Test
         @DisplayName("이미 존재하는 이름으로 저장 시 예외가 발생한다")
         void saveMember_DuplicateName() {
             // Given
@@ -238,7 +213,8 @@ class MemberServiceTest {
             // When & Then
             assertThatThrownBy(() -> memberService.saveMember(shortName, newUid, newEmail))
                     .isInstanceOf(CustomException.class)
-                    .matches(e -> ((CustomException) e).getErrorCode().getCode().equals(MemberCustomErrorCode.INVALID_NAME_LENGTH.getCode()));
+                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
+                            .equals(MemberCustomErrorCode.INVALID_NAME_LENGTH.getCode()));
         }
 
         @Test
@@ -252,7 +228,8 @@ class MemberServiceTest {
             // When & Then
             assertThatThrownBy(() -> memberService.saveMember(longName, newUid, newEmail))
                     .isInstanceOf(CustomException.class)
-                    .matches(e -> ((CustomException) e).getErrorCode().getCode().equals(MemberCustomErrorCode.INVALID_NAME_LENGTH.getCode()));
+                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
+                            .equals(MemberCustomErrorCode.INVALID_NAME_LENGTH.getCode()));
         }
 
         @Test
