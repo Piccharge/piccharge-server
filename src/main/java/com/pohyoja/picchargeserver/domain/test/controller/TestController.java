@@ -10,25 +10,30 @@ import com.pohyoja.picchargeserver.domain.member.dto.MemberDTO;
 import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
 import com.pohyoja.picchargeserver.domain.member.service.MemberService;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.pohyoja.picchargeserver.domain.photo.dto.request.PhotoAddRequest;
+import com.pohyoja.picchargeserver.domain.photo.dto.request.ReactionAddRequest;
+import com.pohyoja.picchargeserver.domain.photo.service.PhotoService;
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collectors;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "03. 테스트 API", description = "테스트 데이터 생성을 위한 API")
+//@Tag(name = "테스트 API", description = "테스트 데이터 생성을 위한 API")
 public class TestController {
 
     private final MemberRepository memberRepository;
@@ -36,8 +41,11 @@ public class TestController {
     private final MemberService memberService;
     private final FamilyService familyService;
 
-    private static int userCounter = 1; // 유저 번호를 관리하는 카운터
+    private int userCounter = 1; // 유저 번호를 관리하는 카운터
+    private Random random = new Random();
+    private final PhotoService photoService;
 
+    @Operation(summary = "테스트용 로그인 정보 가져오기", deprecated = true)
     @GetMapping("/test")
     public BaseResponse<JwtUserDetails> test(@AuthenticationPrincipal JwtUserDetails userDetails) {
         return BaseResponse.onSuccess(userDetails);
@@ -47,19 +55,17 @@ public class TestController {
      * 테스트 데이터를 생성합니다.
      *
      * @param familyCount      생성할 가족 수 (기본값: 2)
-     * @param membersPerFamily 각 가족별 멤버 수 (콤마로 구분, 기본값: "6,3")
+     * @param membersPerFamily 각 가족별 멤버 수 (콤마로 구분, 기본값: "3,6")
      * @return 생성된 테스트 데이터
      */
+    @Operation(summary = "테스트용 임시 데이터 생성하기", description = "가족 2개, 유저 9명, 유저랑 사진과 반응 랜덤 생성", deprecated = true)
     @PostMapping("/test/create-test-data")
     public BaseResponse<Map<String, Object>> createTestData(
             @RequestParam(defaultValue = "2") int familyCount,
-            @RequestParam(defaultValue = "6,3") String membersPerFamily) {
+            @RequestParam(defaultValue = "3,6") String membersPerFamily) {
 
         log.info("테스트 데이터 생성 시작: 가족 {}개", familyCount);
         Map<String, Object> result = new HashMap<>();
-
-        // 카운터 초기화 (테스트 데이터 생성 시 항상 1부터 시작)
-        userCounter = 1;
 
         // membersPerFamily 문자열을 정수 배열로 변환
         String[] memberCountsStr = membersPerFamily.split(",");
@@ -80,7 +86,6 @@ public class TestController {
 
         // 가족별 데이터 생성
         for (int i = 0; i < familyCount; i++) {
-            String familyPrefix = "family" + (i + 1);
             Map<String, Object> familyResult = createTestFamily(memberCounts[i]);
             result.putAll(familyResult);
         }
@@ -108,7 +113,7 @@ public class TestController {
         // 모든 멤버 생성 (숫자로 된 이름 부여)
         for (int i = 0; i < memberCount; i++) {
             String userName = "유저" + userCounter++;
-            String userUid = generateRandomUid();
+            String userUid = generateRandomUid(20);
             String userEmail = "user" + (userCounter - 1) + "@test.com";
 
             MemberDTO memberDTO = memberService.saveMember(userName, userUid, userEmail);
@@ -129,19 +134,36 @@ public class TestController {
                 familyService.joinFamilyByInviteCode(inviteCode, familyMembers.get(i).getUid());
             }
 
-            log.info("{}번 가족 생성 완료, 구성원 {}명", family.getId(), familyMembers.size());
+            // 모든 멤버들이 사진 랜덤 개수 업로드, 모두 랜덤 리액션 추가
+            int photoCount = 0;
+            for (int i = 0; i < familyMembers.size(); i++) {
+                int randomPhotoCount = random.nextInt(5) + 1;
+                for (int j = 0; j < randomPhotoCount; j++) {
+                    photoCount++;
+                    PhotoAddRequest photoAddRequest = new PhotoAddRequest(UUID.randomUUID(),
+                            "https://" + generateRandomUid(5) + ".com/" + familyResponse.id() * 10 + i);
+                    UUID newPhotoID = photoService.addPhoto(family.getId(), familyMembers.get(i).getUid(),
+                                    photoAddRequest)
+                            .id();
+                    ReactionAddRequest reactionAddRequest = generateRandomReaction();
+                    photoService.addReaction(family.getId(), newPhotoID, familyMembers.get(i).getUid(),
+                            reactionAddRequest);
+                }
+            }
+
+            log.info("{}번 가족 생성 완료, 구성원 {}명 사진 {}장", family.getId(), familyMembers.size(), photoCount);
 
             // 결과 저장
-            result.put(family.getId() + "Id", family.getId());
-            result.put(family.getId() + "MembersCount", familyMembers.size());
-            result.put(family.getId() + "Members", familyMembers.stream()
+            result.put(family.getId() + " Id", family.getId());
+            result.put(family.getId() + " MembersCount", familyMembers.size());
+            result.put(family.getId() + " Members", familyMembers.stream()
                     .map(m -> Map.of(
                             "uid", m.getUid(),
                             "name", m.getName(),
                             "email", m.getEmail(),
                             "role", m.getRole()))
-                    .collect(Collectors.toList()));
-            result.put(family.getId() + "InviteCode", inviteCode);
+                    .toList());
+            result.put(family.getId() + " InviteCode", inviteCode);
         }
 
         return result;
@@ -152,17 +174,23 @@ public class TestController {
      *
      * @return 임의 생성된 UID
      */
-    private String generateRandomUid() {
+    private String generateRandomUid(int length) {
         // 임의 UID 생성
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        StringBuilder sb = new StringBuilder(20);
-        sb.append("TEST:");
-        Random random = new Random();
+        StringBuilder sb = new StringBuilder(length + 4);
+        sb.append("TEST");
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < length; i++) {
             sb.append(chars.charAt(random.nextInt(chars.length())));
         }
 
         return sb.toString();
+    }
+
+    private ReactionAddRequest generateRandomReaction() {
+        String[] reactionTypes = {"LIKE", "LOVE", "STAR", "FIRE"};
+        String randomReaction = reactionTypes[random.nextInt(reactionTypes.length)];
+        int randomCount = random.nextInt(10) + 1;
+        return new ReactionAddRequest(randomReaction, randomCount);
     }
 }
