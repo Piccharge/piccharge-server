@@ -12,8 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -28,16 +26,13 @@ public class Family extends BaseEntity {
     @Column(name = "family_id")
     private Long id;
 
-    @Column(nullable = false)
-    private LocalDateTime lastPhotoAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-
     @Embedded
-    private Reaction reaction = new Reaction();
+    private Reaction totalReaction = new Reaction();
 
     @OneToMany(mappedBy = "family", cascade = CascadeType.ALL)
     private List<Member> members = new ArrayList<>();
 
-    @OneToMany(mappedBy = "family", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "family", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<Photo> photos = new ArrayList<>();
 
     // 연관관계 메소드 호출
@@ -47,7 +42,8 @@ public class Family extends BaseEntity {
 
     public void addPhoto(Photo photo) {
         photo.setFamily(this);
-
-        this.lastPhotoAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        if (!this.photos.contains(photo)) {
+            this.photos.add(photo);
+        }
     }
 }

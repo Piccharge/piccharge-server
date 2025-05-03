@@ -18,7 +18,7 @@ public enum FamilyCustomErrorCode implements CustomErrorCodeInterface {
     ALREADY_FAMILY_MEMBER("FAMILY007", "이미 가족 구성원입니다", HttpStatus.BAD_REQUEST),
     INVITE_CODE_GENERATION_FAILED("FAMILY008", "초대 코드가 5번 넘게 중복 생성되었습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     FAMILY_ALREADY_FULL("FAMILY009", "가족 구성원은 6명을 초과할 수 없습니다.", HttpStatus.BAD_REQUEST),
-    ;
+    INVALID_INVITE_CODE_LENGTH("FAMILY010", "유효하지 않은 초대 코드 길이입니다", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;

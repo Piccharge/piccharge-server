@@ -14,10 +14,12 @@ import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.exception.MemberCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
 import com.pohyoja.picchargeserver.domain.photo.dto.ReactionDTO;
+import com.pohyoja.picchargeserver.domain.photo.entity.Photo;
 import com.pohyoja.picchargeserver.domain.photo.repository.PhotoRepository;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -116,8 +118,12 @@ public class FamilyService {
         Family family = findFamilyById(familyId);
         validateFamilyMember(family, member);
 
-        LocalDateTime latestTime = family.getLastPhotoAt();
-        return new LatestUploadTimeResponse(latestTime);
+        Optional<Photo> latestPhoto = photoRepository.findTopByFamilyOrderByCreatedAtDesc(family);
+
+        LocalDateTime lastPhotoTime = latestPhoto.isPresent() ?
+                latestPhoto.get().getCreatedAt() :
+                LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        return new LatestUploadTimeResponse(lastPhotoTime);
     }
 
     /**
@@ -164,13 +170,23 @@ public class FamilyService {
      */
     public FamilyUserNamesResponse getFamilyUserNamesByInviteCode(String code) {
         InviteCode inviteCode = findInviteCodeByCode(code);
-
         validateInviteCodeExpired(inviteCode);
 
         List<String> memberNames = inviteCode.getFamily().getMembers().stream()
                 .map(Member::getName)
                 .toList();
         return new FamilyUserNamesResponse(memberNames);
+    }
+
+    private String validateCode(String code) {
+        if (code == null || code.isBlank()) {
+            throw new CustomException(FamilyCustomErrorCode.INVALID_INVITE_CODE_LENGTH);
+        }
+        code = code.trim();
+        if (code.length() != 6) {
+            throw new CustomException(FamilyCustomErrorCode.INVALID_INVITE_CODE_LENGTH);
+        }
+        return code.toUpperCase();
     }
 
     /**
@@ -218,6 +234,7 @@ public class FamilyService {
      * 초대 코드로 조회
      */
     private InviteCode findInviteCodeByCode(String code) {
+        code = validateCode(code);
         return inviteCodeRepository.findByCode(code)
                 .orElseThrow(() -> new CustomException(FamilyCustomErrorCode.INVITE_CODE_NOT_FOUND));
     }
@@ -235,11 +252,17 @@ public class FamilyService {
      * Family 엔티티를 FamilyResponse DTO로 변환
      */
     private FamilyResponse convertToFamilyResponse(Family family) {
+        Optional<Photo> latestPhoto = photoRepository.findTopByFamilyOrderByCreatedAtDesc(family);
+
+        LocalDateTime lastPhotoTime = latestPhoto.isPresent() ?
+                latestPhoto.get().getCreatedAt() :
+                LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+
         return new FamilyResponse(
                 family.getId(),
-                family.getLastPhotoAt(),
+                lastPhotoTime,
                 photoRepository.countByFamilyId(family.getId()),
-                ReactionDTO.of(family.getReaction())
+                ReactionDTO.of(family.getTotalReaction())
         );
     }
 
