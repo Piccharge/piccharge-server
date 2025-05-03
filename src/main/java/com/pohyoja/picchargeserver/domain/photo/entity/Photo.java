@@ -14,7 +14,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,7 +30,6 @@ public class Photo extends BaseEntity {
 
     @Embedded
     private Reaction reaction = new Reaction();
-    ;
 
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "family_id")
@@ -41,13 +39,10 @@ public class Photo extends BaseEntity {
     @JoinColumn(name = "upload_member_id")
     private Member uploadMember;
 
-    @Builder
-    public Photo(UUID id, String url, Reaction reaction, Family family, Member uploadMember) {
+    public Photo(UUID id, String url, Reaction reaction) {
         this.id = id;
         this.url = url;
         this.reaction = reaction;
-        this.family = family;
-        this.uploadMember = uploadMember;
     }
 
     // 연관관계 편의 메서드
@@ -63,7 +58,6 @@ public class Photo extends BaseEntity {
         }
     }
 
-
     public void setUploadMember(Member uploadMember) {
         if (this.uploadMember != null && this.uploadMember != uploadMember) {
             this.uploadMember.getPhotos().remove(this);
@@ -74,5 +68,10 @@ public class Photo extends BaseEntity {
         if (uploadMember != null && !uploadMember.getPhotos().contains(this)) {
             uploadMember.getPhotos().add(this);
         }
+    }
+
+    public void clearAssociations() {
+        setFamily(null);
+        setUploadMember(null);
     }
 }

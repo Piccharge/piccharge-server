@@ -20,4 +20,8 @@ public record ReactionDTO(
                 reaction.getLikeCount()
         );
     }
+
+    public static ReactionDTO empty() {
+        return new ReactionDTO(0, 0, 0, 0);
+    }
 }
