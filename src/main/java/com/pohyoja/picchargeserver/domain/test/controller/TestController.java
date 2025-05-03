@@ -45,7 +45,7 @@ public class TestController {
     private Random random = new Random();
     private final PhotoService photoService;
 
-    @Operation(summary = "테스트용 로그인 정보 가져오기", deprecated = true)
+    @Operation(summary = "authorizations 테스트용 firebase ID Token 로그인 정보 가져오기", deprecated = true)
     @GetMapping("/test")
     public BaseResponse<JwtUserDetails> test(@AuthenticationPrincipal JwtUserDetails userDetails) {
         return BaseResponse.onSuccess(userDetails);
