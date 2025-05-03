@@ -5,7 +5,6 @@ import static jakarta.persistence.FetchType.LAZY;
 import com.pohyoja.picchargeserver.common.BaseEntity;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.photo.entity.Photo;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -44,7 +43,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "family_id")
     private Family family;
 
-    @OneToMany(mappedBy = "uploadMember", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "uploadMember")
     private List<Photo> photos = new ArrayList<>();
 
     @Builder

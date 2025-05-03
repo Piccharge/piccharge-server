@@ -70,15 +70,17 @@ public class MemberService {
         if (memberRepository.existsById(uid)) {
             throw new CustomException(MemberCustomErrorCode.MEMBER_ALREADY_EXISTS);
         }
-
+        if (name.isBlank() || email.isBlank()) {
+            throw new CustomException(MemberCustomErrorCode.MISSING_PARAMETER);
+        }
         name = name.trim();
         // 이름 길이 체크 (2자에서 12자 이내, 한글 기준)
-        if (name != null && !name.isEmpty() && (name.length() < 2 || name.length() > 12)) {
+        if (!name.isEmpty() && (name.length() < 2 || name.length() > 12)) {
             throw new CustomException(MemberCustomErrorCode.INVALID_NAME_LENGTH);
         }
 
-        // 이름 중복 체크 (이름이 null이 아닌 경우에만)
-        if (name != null && !name.isEmpty() && memberRepository.findByName(name).isPresent()) {
+        // 이름 중복 체크
+        if (!name.isEmpty() && memberRepository.findByName(name).isPresent()) {
             throw new CustomException(MemberCustomErrorCode.MEMBER_ALREADY_EXISTS);
         }
 
