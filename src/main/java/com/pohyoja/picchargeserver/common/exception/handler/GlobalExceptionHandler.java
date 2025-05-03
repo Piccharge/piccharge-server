@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<BaseResponse<String>> handleGeneralException(Exception e) {
-        log.error("CustomException: {}", e.getMessage());
+        log.error("Unhandled Exception 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.INTERNAL_SERVER_ERROR.getErrorCode());
     }
 
@@ -47,6 +47,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleConstraintViolationException(
             ConstraintViolationException e
     ) {
+        log.error("ConstraintViolationException 빌생", e);
         return createResponseEntity(GlobalCustomErrorCode.VALIDATION_FAILED.getErrorCode());
     }
 
@@ -57,6 +58,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException e
     ) {
+        log.error("ConstraintViolationException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.METHOD_ARGUMENT_TYPE_MISMATCH.getErrorCode());
     }
 
@@ -67,6 +69,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleMethodArgumentNotValid(
             MethodArgumentNotValidException e
     ) {
+        log.error("MethodArgumentNotValidException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.METHOD_ARGUMENT_NOT_VALID.getErrorCode());
     }
 
@@ -77,6 +80,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleNoHandlerFoundException(
             NoHandlerFoundException e
     ) {
+        log.error("NoHandlerFoundException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.NO_HANDLER_FOUND.getErrorCode());
     }
 
@@ -87,36 +91,43 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<String>> handleDataIntegrityViolationException(
             DataIntegrityViolationException e
     ) {
+        log.error("DataIntegrityViolationException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.DATA_INTEGRITY_VIOLATION.getErrorCode());
     }
 
     @ExceptionHandler(DataAccessException.class)
     public ResponseEntity<BaseResponse<String>> handleDataAccessException(DataAccessException e) {
+        log.error("DataAccessException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.DATA_ACCESS_ERROR.getErrorCode());
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<BaseResponse<String>> handleAuthenticationException(AuthenticationException e) {
+        log.error("AuthenticationException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.AUTHENTICATION_FAILED.getErrorCode());
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<BaseResponse<String>> handleAccessDeniedException(AccessDeniedException e) {
+        log.error("AccessDeniedException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.ACCESS_DENIED.getErrorCode());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<BaseResponse<String>> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException e) {
+        log.error("HttpMediaTypeNotSupportedException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.MEDIA_TYPE_NOT_SUPPORTED.getErrorCode());
     }
 
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<BaseResponse<String>> handleHttpClientErrorException(HttpClientErrorException e) {
+        log.error("HttpClientErrorException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.CLIENT_ERROR.getErrorCode());
     }
 
     @ExceptionHandler(HttpServerErrorException.class)
     public ResponseEntity<BaseResponse<String>> handleHttpServerErrorException(HttpServerErrorException e) {
+        log.error("HttpServerErrorException 발생", e);
         return createResponseEntity(GlobalCustomErrorCode.SERVER_ERROR.getErrorCode());
     }
 
