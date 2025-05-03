@@ -116,7 +116,7 @@ public class MemberService {
         if (member.getFamily() != null && member.getFamily().getMembers() != null) {
             member.getFamily().getMembers().stream()
                     .filter(m -> !m.getUid().equals(member.getUid()))
-                    .forEach(m -> connectedTo.add(m.getUid()));
+                    .forEach(m -> connectedTo.add(m.getName()));
         }
 
         Long familyId = null;
