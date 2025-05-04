@@ -140,13 +140,14 @@ public class TestController {
                 int randomPhotoCount = random.nextInt(5) + 1;
                 for (int j = 0; j < randomPhotoCount; j++) {
                     photoCount++;
-                    PhotoAddRequest photoAddRequest = new PhotoAddRequest(UUID.randomUUID(),
+                    PhotoAddRequest photoAddRequest = new PhotoAddRequest(
+                            UUID.fromString(UUID.randomUUID().toString().toUpperCase()),
                             "https://" + generateRandomUid(5) + ".com/" + familyResponse.id() * 10 + i);
-                    UUID newPhotoID = photoService.addPhoto(family.getId(), familyMembers.get(i).getUid(),
+                    String newPhotoID = photoService.addPhoto(family.getId(), familyMembers.get(i).getUid(),
                                     photoAddRequest)
                             .id();
                     ReactionAddRequest reactionAddRequest = generateRandomReaction();
-                    photoService.addReaction(family.getId(), newPhotoID, familyMembers.get(i).getUid(),
+                    photoService.addReaction(family.getId(), UUID.fromString(newPhotoID), familyMembers.get(i).getUid(),
                             reactionAddRequest);
                 }
             }

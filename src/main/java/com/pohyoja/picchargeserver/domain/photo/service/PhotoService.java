@@ -4,6 +4,7 @@ import com.pohyoja.picchargeserver.common.exception.CustomException;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.family.repository.FamilyRepository;
+import com.pohyoja.picchargeserver.domain.file.service.FileService;
 import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.exception.MemberCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
@@ -38,6 +39,7 @@ public class PhotoService {
     private final FamilyRepository familyRepository;
     private final MemberRepository memberRepository;
     private final PhotoRepository photoRepository;
+    private final FileService fileService;
 
     /**
      * 가족의 최신 사진 조회
@@ -105,7 +107,7 @@ public class PhotoService {
         familyRepository.save(family);
 
         return new PhotoDTO(
-                request.id(),
+                request.id().toString().toUpperCase(),
                 member.getName(),
                 photo.getCreatedAt(),
                 request.url(),
@@ -128,6 +130,7 @@ public class PhotoService {
         validateOwnership(photo, member);
         photo.clearAssociations();
         photoRepository.delete(photo);
+        fileService.deleteImageFromS3(photoId.toString());
     }
 
     private Photo findPhotoById(UUID photoId) {

@@ -5,10 +5,9 @@ import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.photo.entity.Photo;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 public record PhotoDTO(
-        UUID id,
+        String id,
         String uploadBy,
         LocalDateTime uploadDate,
         String urlString,
@@ -21,7 +20,7 @@ public record PhotoDTO(
         Member uploadMember = photo.getUploadMember();
         Family family = photo.getFamily();
         return new PhotoDTO(
-                photo.getId(),
+                photo.getId().toString().toUpperCase(),
                 uploadMember.getName(),
                 photo.getCreatedAt(),
                 photo.getUrl(),
