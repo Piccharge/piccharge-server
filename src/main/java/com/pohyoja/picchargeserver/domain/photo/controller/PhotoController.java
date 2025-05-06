@@ -117,7 +117,7 @@ public class PhotoController {
             @Parameter(description = "조회할 가족 ID", required = true, example = "1")
             @PathVariable Long familyId,
 
-            @Parameter(description = "조회할 사진 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+            @Parameter(description = "조회할 사진 ID", required = true, example = "d421cc8d-d15a-4161-8eaa-86df5d5d699e")
             @PathVariable UUID photoId,
 
             @Parameter(description = "현재 인증된 사용자 정보", hidden = true)
@@ -166,7 +166,7 @@ public class PhotoController {
             @Parameter(description = "삭제할 가족 ID", required = true, example = "1")
             @PathVariable Long familyId,
 
-            @Parameter(description = "삭제할 사진 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+            @Parameter(description = "삭제할 사진 ID", required = true, example = "d421cc8d-d15a-4161-8eaa-86df5d5d699e")
             @PathVariable UUID photoId,
 
             @Parameter(description = "현재 인증된 사용자 정보", hidden = true)
@@ -192,7 +192,7 @@ public class PhotoController {
             @Parameter(description = "가족 ID", required = true, example = "1")
             @PathVariable Long familyId,
 
-            @Parameter(description = "사진 ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+            @Parameter(description = "사진 ID", required = true, example = "d421cc8d-d15a-4161-8eaa-86df5d5d699e")
             @PathVariable UUID photoId,
 
             @Parameter(description = "현재 인증된 사용자 정보", hidden = true)

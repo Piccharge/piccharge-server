@@ -71,13 +71,13 @@ public class FileService {
     }
 
     private String createPath(String extension, String fileName) {
-        fileName = fileName.trim().toUpperCase();
+        fileName = fileName.trim();
         validateFileName(fileName);
         return String.format("%s/%s.%s", IMAGE_FOLDER_NAME, fileName, extension);
     }
 
     private String createFileId() {
-        return UUID.randomUUID().toString().toUpperCase();
+        return UUID.randomUUID().toString();
     }
 
     private void validateExtension(String extension) {

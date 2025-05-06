@@ -127,7 +127,7 @@ public class PhotoService {
         familyRepository.save(family);
 
         return new PhotoDTO(
-                request.id().toString().toUpperCase(),
+                request.id(),
                 member.getName(),
                 photo.getCreatedAt(),
                 request.url(),

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Tag(name = "File API", description = "S3로 파일를 업로드 하기 위해 사용되는 API 입니다.")
+@Tag(name = "04. File API", description = "S3로 파일를 업로드 하기 위해 사용되는 API 입니다.")
 public class FileController {
     private final FileService fileService;
 
@@ -25,7 +25,7 @@ public class FileController {
     public BaseResponse<UrlResponse> getPresignedUrl(
             @Parameter(description = "파일 확장자", example = "webp")
             @PathVariable(name = "extension") String extension,
-            @Parameter(description = "원하는 파일 이름 (UUID 형식, 필수 아님)", example = "7C67FBC2-3FA1-4F5E-83A4-3B40D19A09F9")
+            @Parameter(description = "원하는 파일 이름 (UUID 형식, 필수 아님)", example = "d421cc8d-d15a-4161-8eaa-86df5d5d699e")
             @RequestParam(name = "fileName", required = false) String fileName) {
         return BaseResponse.onSuccess(fileService.getPresignedPutUrl(extension, fileName));
     }
