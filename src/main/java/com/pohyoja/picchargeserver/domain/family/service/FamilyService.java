@@ -4,7 +4,6 @@ import com.pohyoja.picchargeserver.common.exception.CustomException;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyUserNamesResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.InviteCodeResponse;
-import com.pohyoja.picchargeserver.domain.family.dto.response.LatestUploadTimeResponse;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.entity.InviteCode;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
@@ -97,7 +96,7 @@ public class FamilyService {
         family.getMembers().remove(member);
 
         if (family.getMembers().isEmpty()) {
-            deleteFamily(family, member);
+            deleteFamily(family);
         }
         log.info("Member {} left family {}", currentUserId, familyId);
     }
@@ -105,25 +104,9 @@ public class FamilyService {
     /**
      * 가족 삭제
      */
-    private void deleteFamily(Family family, Member member) {
+    private void deleteFamily(Family family) {
         familyRepository.delete(family);
         log.info("Family deleted: {}", family.getId());
-    }
-
-    /**
-     * 가족의 최근 사진 업로드 시간 조회
-     */
-    public LatestUploadTimeResponse getLatestPhotoUploadTime(Long familyId, String currentUserId) {
-        Member member = findMemberById(currentUserId);
-        Family family = findFamilyById(familyId);
-        validateFamilyMember(family, member);
-
-        Optional<Photo> latestPhoto = photoRepository.findTopByFamilyOrderByCreatedAtDesc(family);
-
-        LocalDateTime lastPhotoTime = latestPhoto.isPresent() ?
-                latestPhoto.get().getCreatedAt() :
-                LocalDateTime.now(ZoneId.of("Asia/Seoul"));
-        return new LatestUploadTimeResponse(lastPhotoTime);
     }
 
     /**
@@ -231,6 +214,15 @@ public class FamilyService {
     }
 
     /**
+     * 가족 구성원 여부 확인
+     */
+    private void validateFamilyMember(Family family, Member member) {
+        if (member.getFamily() != family) {
+            throw new CustomException(FamilyCustomErrorCode.NOT_FAMILY_MEMBER);
+        }
+    }
+
+    /**
      * 초대 코드로 조회
      */
     private InviteCode findInviteCodeByCode(String code) {
@@ -240,11 +232,11 @@ public class FamilyService {
     }
 
     /**
-     * 가족 구성원 여부 확인
+     * 초대 코드 만료 검증
      */
-    private void validateFamilyMember(Family family, Member member) {
-        if (member.getFamily() != family) {
-            throw new CustomException(FamilyCustomErrorCode.NOT_FAMILY_MEMBER);
+    private static void validateInviteCodeExpired(InviteCode inviteCode) {
+        if (inviteCode.getExpiresAt().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
+            throw new CustomException(FamilyCustomErrorCode.INVITE_CODE_EXPIRED);
         }
     }
 
@@ -264,14 +256,5 @@ public class FamilyService {
                 photoRepository.countByFamilyId(family.getId()),
                 ReactionDTO.of(family.getTotalReaction())
         );
-    }
-
-    /**
-     * 초대 코드 만료 검증
-     */
-    private static void validateInviteCodeExpired(InviteCode inviteCode) {
-        if (inviteCode.getExpiresAt().isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")))) {
-            throw new CustomException(FamilyCustomErrorCode.INVITE_CODE_EXPIRED);
-        }
     }
 }

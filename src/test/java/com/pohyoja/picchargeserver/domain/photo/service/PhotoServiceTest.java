@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.pohyoja.picchargeserver.common.exception.CustomException;
+import com.pohyoja.picchargeserver.domain.family.dto.response.LatestUploadTimeResponse;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.family.repository.FamilyRepository;
 import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.entity.Role;
+import com.pohyoja.picchargeserver.domain.member.exception.MemberCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
 import com.pohyoja.picchargeserver.domain.photo.dto.PhotoDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.ReactionDTO;
@@ -209,6 +211,71 @@ class PhotoServiceTest {
                     .isInstanceOf(CustomException.class)
                     .matches(e -> ((CustomException) e).getErrorCode().getCode()
                             .equals(FamilyCustomErrorCode.NOT_FAMILY_MEMBER.getCode()));
+        }
+    }
+
+    @Nested
+    @DisplayName("최근 사진 업로드 시간 조회 기능")
+    class GetLatestPhotoUploadTimeTests {
+
+        @Test
+        @DisplayName("최근 사진 업로드 시간을 정상적으로 조회한다")
+        void getLatestPhotoUploadTime_Success() {
+            // Given
+            Member member = saveTestMember();
+            Family family = createAndSaveFamilyWithMember(member);
+
+            // When
+            LatestUploadTimeResponse response = photoService.getLatestPhotoUploadTime(family.getId(), member.getUid());
+
+            // Then
+            assertThat(response).isNotNull();
+            assertThat(response.latestUploadTime()).isNotNull();
+            // 가족 생성 시 lastPhotoAt이 현재 시간으로 설정됨
+            // 시간 비교는 하지 않고 null이 아닌지만 확인
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 가족 ID로 조회 시 예외가 발생한다")
+        void getLatestPhotoUploadTime_FamilyNotFound() {
+            // Given
+            Member member = saveTestMember();
+            Long nonExistentFamilyId = 999L;
+
+            // When & Then
+            assertThatThrownBy(() -> photoService.getLatestPhotoUploadTime(nonExistentFamilyId, member.getUid()))
+                    .isInstanceOf(CustomException.class)
+                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
+                            .equals(FamilyCustomErrorCode.FAMILY_NOT_FOUND.getCode()));
+        }
+
+        @Test
+        @DisplayName("가족 구성원이 아닌 경우 예외가 발생한다")
+        void getLatestPhotoUploadTime_NotFamilyMember() {
+            // Given
+            Member member = saveTestMember();
+            Family family = createAndSaveFamily(); // 멤버가 속하지 않은 가족
+
+            // When & Then
+            assertThatThrownBy(() -> photoService.getLatestPhotoUploadTime(family.getId(), member.getUid()))
+                    .isInstanceOf(CustomException.class)
+                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
+                            .equals(FamilyCustomErrorCode.NOT_FAMILY_MEMBER.getCode()));
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 멤버 ID로 조회 시 예외가 발생한다")
+        void getLatestPhotoUploadTime_MemberNotFound() {
+            // Given
+            Member member = saveTestMember();
+            Family family = createAndSaveFamilyWithMember(member);
+            String nonExistentMemberId = "non-existent-member-id";
+
+            // When & Then
+            assertThatThrownBy(() -> photoService.getLatestPhotoUploadTime(family.getId(), nonExistentMemberId))
+                    .isInstanceOf(CustomException.class)
+                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
+                            .equals(MemberCustomErrorCode.MEMBER_ID_NOT_FOUND.getCode()));
         }
     }
 

@@ -2,6 +2,7 @@ package com.pohyoja.picchargeserver.domain.photo.controller;
 
 import com.pohyoja.picchargeserver.common.BaseResponse;
 import com.pohyoja.picchargeserver.common.security.JwtUserDetails;
+import com.pohyoja.picchargeserver.domain.family.dto.response.LatestUploadTimeResponse;
 import com.pohyoja.picchargeserver.domain.photo.dto.PhotoDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.ReactionDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.request.PhotoAddRequest;
@@ -55,6 +56,27 @@ public class PhotoController {
 
         log.info("Fetching latest photo for family ID: {}", familyId);
         return BaseResponse.onSuccess(photoService.fetchLatestPhoto(familyId, userDetails.uid()));
+    }
+
+    @GetMapping("/families/{familyId}/photos/latest-upload-time")
+    @Operation(
+            summary = "가족에 가장 최근에 업로드된 사진의 업로드 시간 가져오기",
+            description = "가족 방에 가장 최근에 업로드된 사진의 시간을 조회합니다. 가족 구성원만 접근 가능합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "가족을 찾을 수 없음", content = @Content),
+            @ApiResponse(responseCode = "403", description = "가족 구성원이 아님", content = @Content)
+    })
+    public BaseResponse<LatestUploadTimeResponse> getLatestPhotoUploadTime(
+            @Parameter(description = "조회할 가족 ID", required = true, example = "1")
+            @PathVariable Long familyId,
+
+            @Parameter(description = "현재 인증된 사용자 정보", hidden = true)
+            @AuthenticationPrincipal JwtUserDetails userDetails) {
+
+        log.info("Getting latest photo upload time for family ID: {}", familyId);
+        return BaseResponse.onSuccess(photoService.getLatestPhotoUploadTime(familyId, userDetails.uid()));
     }
 
     @GetMapping("/families/{familyId}/photos")

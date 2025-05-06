@@ -7,7 +7,6 @@ import com.pohyoja.picchargeserver.common.exception.CustomException;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyUserNamesResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.InviteCodeResponse;
-import com.pohyoja.picchargeserver.domain.family.dto.response.LatestUploadTimeResponse;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.entity.InviteCode;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
@@ -110,10 +109,10 @@ class FamilyServiceTest {
     // Helper method to verify reaction counts are all zero
     private void verifyAllReactionCountsAreZero(ReactionDTO reactionDTO) {
         assertThat(reactionDTO).isNotNull();
-        assertThat(reactionDTO.love()).isEqualTo(0);
-        assertThat(reactionDTO.fire()).isEqualTo(0);
-        assertThat(reactionDTO.star()).isEqualTo(0);
-        assertThat(reactionDTO.like()).isEqualTo(0);
+        assertThat(reactionDTO.love()).isZero();
+        assertThat(reactionDTO.fire()).isZero();
+        assertThat(reactionDTO.star()).isZero();
+        assertThat(reactionDTO.like()).isZero();
     }
 
     @Nested
@@ -136,7 +135,7 @@ class FamilyServiceTest {
             assertThat(response.latestUploadTime()).isNotNull();
 
             // photoRepository.countByFamilyId()를 모킹하지 않은 경우, 0이 나온다는 가정 하에 검증
-            assertThat(response.totalPhotoCount()).isEqualTo(0);
+            assertThat(response.totalPhotoCount()).isZero();
 
             // Reaction 관련 값이 기본 0으로 잘 매핑되는지 확인
             verifyAllReactionCountsAreZero(response.reactionsCount());
@@ -282,7 +281,7 @@ class FamilyServiceTest {
             assertThat(response.latestUploadTime()).isBefore(LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusSeconds(1));
 
             // 가족 막 생성한 직후 사진 개수가 0인지 확인
-            assertThat(response.totalPhotoCount()).isEqualTo(0);
+            assertThat(response.totalPhotoCount()).isZero();
 
             // Reaction 관련 값이 기본 0으로 잘 매핑되는지 확인
             verifyAllReactionCountsAreZero(response.reactionsCount());
@@ -293,7 +292,6 @@ class FamilyServiceTest {
         void createFamily_AlreadyFamilyMember() {
             // Given
             Member member = saveTestMember();
-            Family family = createAndSaveFamilyWithMember(member);
 
             // When & Then
             assertThatThrownBy(() -> familyService.createFamily(member.getUid()))
@@ -390,71 +388,6 @@ class FamilyServiceTest {
 
             // When & Then
             assertThatThrownBy(() -> familyService.leaveFamily(family.getId(), nonExistentMemberId))
-                    .isInstanceOf(CustomException.class)
-                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
-                            .equals(MemberCustomErrorCode.MEMBER_ID_NOT_FOUND.getCode()));
-        }
-    }
-
-    @Nested
-    @DisplayName("최근 사진 업로드 시간 조회 기능")
-    class GetLatestPhotoUploadTimeTests {
-
-        @Test
-        @DisplayName("최근 사진 업로드 시간을 정상적으로 조회한다")
-        void getLatestPhotoUploadTime_Success() {
-            // Given
-            Member member = saveTestMember();
-            Family family = createAndSaveFamilyWithMember(member);
-
-            // When
-            LatestUploadTimeResponse response = familyService.getLatestPhotoUploadTime(family.getId(), member.getUid());
-
-            // Then
-            assertThat(response).isNotNull();
-            assertThat(response.latestUploadTime()).isNotNull();
-            // 가족 생성 시 lastPhotoAt이 현재 시간으로 설정됨
-            // 시간 비교는 하지 않고 null이 아닌지만 확인
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 가족 ID로 조회 시 예외가 발생한다")
-        void getLatestPhotoUploadTime_FamilyNotFound() {
-            // Given
-            Member member = saveTestMember();
-            Long nonExistentFamilyId = 999L;
-
-            // When & Then
-            assertThatThrownBy(() -> familyService.getLatestPhotoUploadTime(nonExistentFamilyId, member.getUid()))
-                    .isInstanceOf(CustomException.class)
-                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
-                            .equals(FamilyCustomErrorCode.FAMILY_NOT_FOUND.getCode()));
-        }
-
-        @Test
-        @DisplayName("가족 구성원이 아닌 경우 예외가 발생한다")
-        void getLatestPhotoUploadTime_NotFamilyMember() {
-            // Given
-            Member member = saveTestMember();
-            Family family = createAndSaveFamily(); // 멤버가 속하지 않은 가족
-
-            // When & Then
-            assertThatThrownBy(() -> familyService.getLatestPhotoUploadTime(family.getId(), member.getUid()))
-                    .isInstanceOf(CustomException.class)
-                    .matches(e -> ((CustomException) e).getErrorCode().getCode()
-                            .equals(FamilyCustomErrorCode.NOT_FAMILY_MEMBER.getCode()));
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 멤버 ID로 조회 시 예외가 발생한다")
-        void getLatestPhotoUploadTime_MemberNotFound() {
-            // Given
-            Member member = saveTestMember();
-            Family family = createAndSaveFamilyWithMember(member);
-            String nonExistentMemberId = "non-existent-member-id";
-
-            // When & Then
-            assertThatThrownBy(() -> familyService.getLatestPhotoUploadTime(family.getId(), nonExistentMemberId))
                     .isInstanceOf(CustomException.class)
                     .matches(e -> ((CustomException) e).getErrorCode().getCode()
                             .equals(MemberCustomErrorCode.MEMBER_ID_NOT_FOUND.getCode()));
@@ -682,7 +615,7 @@ class FamilyServiceTest {
             assertThat(memberIds).contains(existingMember.getUid(), newMember.getUid());
 
             // photoRepository.countByFamilyId()가 호출되는지 확인 (모킹하지 않았으므로 0 반환 예상)
-            assertThat(response.totalPhotoCount()).isEqualTo(0);
+            assertThat(response.totalPhotoCount()).isZero();
 
             // Reaction 관련 값이 기본 0으로 잘 매핑되는지 확인
             verifyAllReactionCountsAreZero(response.reactionsCount());
@@ -715,7 +648,6 @@ class FamilyServiceTest {
         void joinFamilyByInviteCode_AlreadyFamilyMember() {
             // Given
             Member member = saveTestMember();
-            Family family1 = createAndSaveFamilyWithMember(member);
 
             Member otherMember = saveMember(createTestMember("other", "다른멤버", "other@example.com", Role.PARENT));
             Family family2 = createAndSaveFamilyWithMember(otherMember);

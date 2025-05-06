@@ -1,6 +1,7 @@
 package com.pohyoja.picchargeserver.domain.photo.service;
 
 import com.pohyoja.picchargeserver.common.exception.CustomException;
+import com.pohyoja.picchargeserver.domain.family.dto.response.LatestUploadTimeResponse;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.family.repository.FamilyRepository;
@@ -18,8 +19,11 @@ import com.pohyoja.picchargeserver.domain.photo.entity.Photo;
 import com.pohyoja.picchargeserver.domain.photo.entity.Reaction;
 import com.pohyoja.picchargeserver.domain.photo.exception.PhotoCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.photo.repository.PhotoRepository;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +57,22 @@ public class PhotoService {
                 .orElseThrow(() -> new CustomException(PhotoCustomErrorCode.PHOTO_NOT_FOUND));
 
         return PhotoDTO.of(latestPhoto);
+    }
+
+    /**
+     * 가족의 최근 사진 업로드 시간 조회
+     */
+    public LatestUploadTimeResponse getLatestPhotoUploadTime(Long familyId, String currentUserId) {
+        Member member = findMemberById(currentUserId);
+        Family family = findFamilyById(familyId);
+        validateFamilyMember(family, member);
+
+        Optional<Photo> latestPhoto = photoRepository.findTopByFamilyOrderByCreatedAtDesc(family);
+
+        LocalDateTime lastPhotoTime = latestPhoto.isPresent() ?
+                latestPhoto.get().getCreatedAt() :
+                LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+        return new LatestUploadTimeResponse(lastPhotoTime);
     }
 
     /**
