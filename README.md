@@ -7,3 +7,7 @@
 픽-챠의 백엔드 서버 코드 저장소입니다.
 
 원본 레파지토리: https://github.com/DeveloperAcademy-POSTECH/2024-MC2-M09-PoHyoja
+
+# 아키텍쳐
+
+<img width="1212" alt="image" src="https://github.com/user-attachments/assets/c3bc60f3-0b9e-4cbe-a1f4-ab40945903a0" />
