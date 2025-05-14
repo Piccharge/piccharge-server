@@ -13,7 +13,7 @@ public record PhotoDTO(
         UUID id,
         String uploadBy,
         LocalDateTime uploadDate,
-        @Schema(description = "사진 URL", example = "https://d36vcr5w3hfui8.cloudfront.net/prod/d421cc8d-d15a-4161-8eaa-86df5d5d699e.webp")
+        @Schema(description = "사진 URL", example = "https://test.cloudfront.net/prod/d421cc8d-d15a-4161-8eaa-86df5d5d699e.webp")
         String urlString,
         ReactionDTO reactions,
         List<String> sharedWith,
