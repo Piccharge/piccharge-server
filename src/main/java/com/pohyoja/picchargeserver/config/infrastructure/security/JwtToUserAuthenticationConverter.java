@@ -4,16 +4,21 @@ import static com.pohyoja.picchargeserver.config.constant.ConfigConstant.EXPECTE
 import static com.pohyoja.picchargeserver.config.constant.ConfigConstant.EXPECTED_ISSUER;
 
 import com.pohyoja.picchargeserver.common.security.JwtUserDetails;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JwtToUserAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+
+    private static final String ADMIN_EMAIL = "child@test.com";
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
@@ -22,12 +27,19 @@ public class JwtToUserAuthenticationConverter implements Converter<Jwt, Abstract
         String uid = jwt.getClaimAsString("user_id");
         String email = jwt.getClaimAsString("email");
 
-        JwtUserDetails principal = new JwtUserDetails(uid, email);
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        if (ADMIN_EMAIL.equals(email)) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+
+        JwtUserDetails principal = new JwtUserDetails(uid, email, authorities);
 
         return new UsernamePasswordAuthenticationToken(
                 principal,
                 jwt.getTokenValue(),
-                principal.getAuthorities()
+                authorities
         );
     }
 
