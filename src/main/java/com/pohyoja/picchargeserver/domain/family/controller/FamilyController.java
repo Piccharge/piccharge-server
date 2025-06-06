@@ -2,6 +2,7 @@ package com.pohyoja.picchargeserver.domain.family.controller;
 
 import com.pohyoja.picchargeserver.common.BaseResponse;
 import com.pohyoja.picchargeserver.common.security.JwtUserDetails;
+import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyIdResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyUserNamesResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.InviteCodeResponse;
@@ -30,6 +31,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class FamilyController {
 
     private final FamilyService familyService;
+    
+    @GetMapping("/families")
+    @Operation(
+            summary = "현재 참여 가족 조회",
+            description = "현재 사용자가 속한 가족의 id를 반환합니다. 가족이 없는 경우 404 Not Found 를 반환합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "404", description = "가족을 찾을 수 없음", content = @Content)
+    })
+    public BaseResponse<FamilyIdResponse> getCurrentFamily(
+            @Parameter(description = "현재 인증된 사용자 정보", hidden = true)
+            @AuthenticationPrincipal JwtUserDetails userDetails) {
+
+        log.info("Getting current family for user: {}", userDetails.uid());
+        return BaseResponse.onSuccess(familyService.getCurrentFamily(userDetails.uid()));
+    }
 
     @GetMapping("/families/{familyId}")
     @Operation(
