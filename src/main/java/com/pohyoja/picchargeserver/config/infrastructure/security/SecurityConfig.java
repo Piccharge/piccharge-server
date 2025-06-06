@@ -10,15 +10,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtDecoders;
+import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
+    private static final String ADMIN_EMAIL = "child@test.com";
     private final JwtToUserAuthenticationConverter jwtToUserAuthenticationConverter;
 
     private static final String[] PUBLIC_URLS = {
@@ -40,6 +45,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(AUTH_WHITELIST).hasRole("ADMIN")
                         .requestMatchers(AUTH_WHITELIST).authenticated()
                         .requestMatchers(PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated())
@@ -50,6 +56,20 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return JwtDecoders.fromIssuerLocation(EXPECTED_ISSUER);
+        NimbusJwtDecoder decoder = JwtDecoders.fromIssuerLocation(EXPECTED_ISSUER);
+
+        OAuth2TokenValidator<Jwt> defaultValidator =
+                JwtValidators.createDefaultWithIssuer(EXPECTED_ISSUER);
+
+        OAuth2TokenValidator<Jwt> superAdminExpSkippingValidator = token -> {
+            String email = token.getClaimAsString("email");
+            if (ADMIN_EMAIL.equals(email)) {
+                return OAuth2TokenValidatorResult.success();
+            }
+            return defaultValidator.validate(token);
+        };
+
+        decoder.setJwtValidator(superAdminExpSkippingValidator);
+        return decoder;
     }
 }

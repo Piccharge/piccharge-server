@@ -1,6 +1,7 @@
 package com.pohyoja.picchargeserver.domain.family.service;
 
 import com.pohyoja.picchargeserver.common.exception.CustomException;
+import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyIdResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyUserNamesResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.InviteCodeResponse;
@@ -35,6 +36,20 @@ public class FamilyService {
     private final MemberRepository memberRepository;
     private final PhotoRepository photoRepository;
     private final InviteCodeRepository inviteCodeRepository;
+
+    /**
+     * 현재 사용자가 속한 가족 조회
+     */
+    public FamilyIdResponse getCurrentFamily(String currentUserId) {
+        Member member = findMemberById(currentUserId);
+        Family family = member.getFamily();
+
+        if (family == null) {
+            throw new CustomException(FamilyCustomErrorCode.FAMILY_NOT_FOUND);
+        }
+
+        return new FamilyIdResponse(family.getId());
+    }
 
     /**
      * 가족 정보 조회
