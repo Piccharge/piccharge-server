@@ -74,8 +74,8 @@ public class MemberService {
             throw new CustomException(MemberCustomErrorCode.MISSING_PARAMETER);
         }
         name = name.trim();
-        // 이름 길이 체크 (2자에서 12자 이내, 한글 기준)
-        if (!name.isEmpty() && (name.length() < 2 || name.length() > 12)) {
+        // 이름 길이 체크 (1자에서 12자 이내)
+        if (!name.isEmpty() && (name.length() < 1 || name.length() > 12)) {
             throw new CustomException(MemberCustomErrorCode.INVALID_NAME_LENGTH);
         }
 
