@@ -30,6 +30,7 @@ public class Photo extends BaseEntity {
     private UUID id;
 
     @NotBlank
+    @URL
     @Column(nullable = false, unique = true)
     private String url;
 
