@@ -1,19 +1,24 @@
 package com.pohyoja.picchargeserver.domain.migration.service;
 
 import com.pohyoja.picchargeserver.common.exception.CustomException;
+import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyIdResponse;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.family.repository.FamilyRepository;
+import com.pohyoja.picchargeserver.domain.family.service.FamilyService;
+import com.pohyoja.picchargeserver.domain.member.dto.MemberDTO;
 import com.pohyoja.picchargeserver.domain.member.entity.Member;
 import com.pohyoja.picchargeserver.domain.member.exception.MemberCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
+import com.pohyoja.picchargeserver.domain.member.service.MemberService;
+import com.pohyoja.picchargeserver.domain.migration.dto.request.PhotoMigrateRequest;
 import com.pohyoja.picchargeserver.domain.photo.dto.PhotoDTO;
-import com.pohyoja.picchargeserver.domain.photo.dto.ReactionDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.request.PhotoAddRequest;
 import com.pohyoja.picchargeserver.domain.photo.entity.Photo;
 import com.pohyoja.picchargeserver.domain.photo.entity.Reaction;
+import com.pohyoja.picchargeserver.domain.photo.exception.PhotoCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.photo.repository.PhotoRepository;
-import java.time.LocalDateTime;
+import com.pohyoja.picchargeserver.domain.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,28 +27,45 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 public class MigrationService {
 
     private final FamilyRepository familyRepository;
     private final MemberRepository memberRepository;
     private final PhotoRepository photoRepository;
 
+    private final FamilyService familyService;
+    private final MemberService memberService;
+    private final PhotoService photoService;
+
+    /**
+     * 유저 생성
+     */
+    public MemberDTO createUser(String name, String memberId, String email) {
+        return memberService.saveMember(name, memberId, email);
+    }
+
+    /**
+     * 현재 가족 조회
+     */
+    public FamilyIdResponse getCurrentFamily(String memberId) {
+        return familyService.getCurrentFamily(memberId);
+    }
+
     /**
      * 사진 추가
      */
-    @Transactional
-    public PhotoDTO migratePhoto(Long familyId, String currentUserId, PhotoAddRequest request,
-                                 LocalDateTime uploadDate, int fire, int love, int like, int star) {
-        Member member = findMemberById(currentUserId);
-        Family family = findFamilyById(familyId);
+    public PhotoDTO migratePhoto(PhotoMigrateRequest photoMigrateRequest, PhotoAddRequest photoAddRequest) {
+        Member member = findMemberById(photoMigrateRequest.memberId());
+        Family family = findFamilyById(photoMigrateRequest.familyId());
         validateFamilyMember(family, member);
 
-        Photo photo = new Photo(request.id(), request.url(), new Reaction());
+        Photo photo = new Photo(photoAddRequest.id(), photoAddRequest.url(), new Reaction());
         Reaction reaction = photo.getReaction();
-        reaction.incrementFire(fire);
-        reaction.incrementLove(love);
-        reaction.incrementLike(like);
-        reaction.incrementStar(star);
+        reaction.incrementFire(photoMigrateRequest.fire());
+        reaction.incrementLove(photoMigrateRequest.love());
+        reaction.incrementLike(photoMigrateRequest.like());
+        reaction.incrementStar(photoMigrateRequest.star());
 
         photo.setUploadMember(member);
         family.addPhoto(photo);
@@ -51,19 +73,12 @@ public class MigrationService {
         Photo savedPhoto = photoRepository.save(photo);
         familyRepository.save(family);
 
-        photoRepository.updatePhotoCreatedAndUpdatedAt(savedPhoto.getId(), uploadDate, uploadDate);
-        photo.setCustomDatesForMigration(uploadDate);
-
-        return new PhotoDTO(
-                request.id(),
-                member.getName(),
-                photo.getCreatedAt(),
-                request.url(),
-                ReactionDTO.empty(),
-                family.getMembers().stream().map(Member::getName).toList(),
-                currentUserId,
-                familyId
-        );
+        savedPhoto = photoRepository.updatePhotoCreatedAndUpdatedAt(
+                savedPhoto.getId(),
+                photoMigrateRequest.uploadDate(),
+                photoMigrateRequest.uploadDate()
+        ).orElseThrow(() -> new CustomException(PhotoCustomErrorCode.PHOTO_UPLOAD_FAILED));
+        return PhotoDTO.of(savedPhoto);
     }
 
     /**
