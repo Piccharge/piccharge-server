@@ -22,6 +22,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "photo")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "photo", indexes = {
+        @Index(name = "idx_photo_family_created_at", columnList = "family_id, created_at DESC")
+})
 public class Photo extends BaseEntity {
     @Id @Column(name = "photo_id")
     private UUID id;
