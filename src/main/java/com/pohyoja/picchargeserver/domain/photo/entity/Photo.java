@@ -13,14 +13,12 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "photo")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "photo", indexes = {
@@ -78,9 +76,5 @@ public class Photo extends BaseEntity {
     public void clearAssociations() {
         setFamily(null);
         setUploadMember(null);
-    }
-
-    public void setCustomDatesForMigration(LocalDateTime uploadDate) {
-        setTimesForMigration(uploadDate);
     }
 }
