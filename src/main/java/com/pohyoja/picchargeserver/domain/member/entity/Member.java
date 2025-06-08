@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -29,13 +30,19 @@ public class Member extends BaseEntity {
     @Id @Column(name = "member_id")
     private String uid;
 
-    @Column(unique = true) // 마이그레이션 이전 로직 유지
+    @NotBlank
+    @Column(unique = true, nullable = false) // 마이그레이션 이전 로직 유지
     private String name;
 
+    @NotBlank
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private int uploadCycle = 3;
 
+    @NotBlank
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 

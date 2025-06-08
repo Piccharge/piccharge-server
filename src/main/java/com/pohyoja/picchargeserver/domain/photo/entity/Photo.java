@@ -13,6 +13,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -28,7 +29,8 @@ public class Photo extends BaseEntity {
     @Id @Column(name = "photo_id")
     private UUID id;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Column(nullable = false, unique = true)
     private String url;
 
     @Embedded
