@@ -99,6 +99,13 @@ public class MigrationService {
         return new FamilyCreateResponse(familyResponse.id(), inviteCodeResponse.code());
     }
 
+    /**
+     * 가족 참여
+     */
+    public FamilyResponse joinFamily(String code, String memberId) {
+        return familyService.joinFamilyByInviteCode(code, memberId);
+    }
+
     private void validateUrl(String photoUrl) {
         if (photoUrl == null || !photoUrl.startsWith(cdnPrefix)) {
             throw new CustomException(PhotoCustomErrorCode.INVALID_PHOTO_URL);

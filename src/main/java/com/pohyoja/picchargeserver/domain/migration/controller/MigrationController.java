@@ -67,11 +67,10 @@ public class MigrationController {
     public BaseResponse<FamilyResponse> joinFamily(
             @RequestBody JoinFamilyRequest joinFamilyRequest
     ) {
-        FamilyResponse familyResponse = familyService.joinFamilyByInviteCode(
+        return BaseResponse.onSuccess(migrationService.joinFamily(
                 joinFamilyRequest.code(),
                 joinFamilyRequest.memberId()
-        );
-        return BaseResponse.onSuccess(familyResponse);
+        ));
     }
 
     // 5. 사진 업로드
