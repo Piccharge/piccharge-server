@@ -33,10 +33,11 @@ public class InviteCode extends BaseEntity {
     @JoinColumn(name = "family_id")
     private Family family;
 
-    private final LocalDateTime expiresAt = LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1);
+    private LocalDateTime expiresAt;
 
     public InviteCode(Family family) {
         this.family = family;
         this.code = generateRandomCode();
+        this.expiresAt = LocalDateTime.now(ZoneId.of("Asia/Seoul")).plusHours(1);
     }
 }
