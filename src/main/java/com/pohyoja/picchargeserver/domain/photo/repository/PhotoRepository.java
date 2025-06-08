@@ -21,7 +21,7 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
 
     @Modifying
     @Query(value = "UPDATE photo SET created_at = :createdAt, updated_at = :updatedAt WHERE photo_id = :photoId", nativeQuery = true)
-    Optional<Photo> updatePhotoCreatedAndUpdatedAt(@Param("photoId") UUID photoId,
-                                                   @Param("createdAt") LocalDateTime createdAt,
-                                                   @Param("updatedAt") LocalDateTime updatedAt);
+    void updatePhotoCreatedAndUpdatedAt(@Param("photoId") UUID photoId,
+                                        @Param("createdAt") LocalDateTime createdAt,
+                                        @Param("updatedAt") LocalDateTime updatedAt);
 }

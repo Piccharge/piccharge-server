@@ -82,11 +82,10 @@ public class MigrationService {
         Photo savedPhoto = photoRepository.save(photo);
         familyRepository.save(family);
 
-        savedPhoto = photoRepository.updatePhotoCreatedAndUpdatedAt(
+        photoRepository.updatePhotoCreatedAndUpdatedAt(
                 savedPhoto.getId(),
                 photoMigrateRequest.uploadDate(),
-                photoMigrateRequest.uploadDate()
-        ).orElseThrow(() -> new CustomException(PhotoCustomErrorCode.PHOTO_UPLOAD_FAILED));
+                photoMigrateRequest.uploadDate());
         return PhotoDTO.of(savedPhoto);
     }
 
