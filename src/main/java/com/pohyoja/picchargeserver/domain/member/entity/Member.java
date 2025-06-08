@@ -27,7 +27,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
-    @Id @Column(name = "member_id")
+    @Id
+    @Column(name = "member_id", length = 28)
+    @Size(min = 28, max = 28)
     private String uid;
 
     @NotBlank
