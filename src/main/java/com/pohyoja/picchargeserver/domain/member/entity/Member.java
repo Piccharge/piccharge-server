@@ -46,7 +46,6 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private int uploadCycle = 3;
 
-    @NotBlank
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
