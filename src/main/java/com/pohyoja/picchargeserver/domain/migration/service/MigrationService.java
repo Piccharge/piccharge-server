@@ -21,6 +21,7 @@ import com.pohyoja.picchargeserver.domain.photo.repository.PhotoRepository;
 import com.pohyoja.picchargeserver.domain.photo.service.PhotoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +38,9 @@ public class MigrationService {
     private final FamilyService familyService;
     private final MemberService memberService;
     private final PhotoService photoService;
+
+    @Value("${app.cdn-prefix}")
+    private String cdnPrefix;
 
     /**
      * 유저 생성
@@ -56,6 +60,8 @@ public class MigrationService {
      * 사진 추가
      */
     public PhotoDTO migratePhoto(PhotoMigrateRequest photoMigrateRequest, PhotoAddRequest photoAddRequest) {
+        validateUrl(photoAddRequest.url());
+
         Member member = findMemberById(photoMigrateRequest.memberId());
         Family family = findFamilyById(photoMigrateRequest.familyId());
         validateFamilyMember(family, member);
@@ -79,6 +85,17 @@ public class MigrationService {
                 photoMigrateRequest.uploadDate()
         ).orElseThrow(() -> new CustomException(PhotoCustomErrorCode.PHOTO_UPLOAD_FAILED));
         return PhotoDTO.of(savedPhoto);
+    }
+
+    private void validateUrl(String photoUrl) {
+        if (photoUrl == null || !photoUrl.startsWith(cdnPrefix)) {
+            throw new CustomException(PhotoCustomErrorCode.INVALID_PHOTO_URL);
+        }
+
+        String lower = photoUrl.toLowerCase();
+        if (!lower.matches(".*\\.(jpg|jpeg|png|webp|gif)$")) {
+            throw new CustomException(PhotoCustomErrorCode.INVALID_PHOTO_URL);
+        }
     }
 
     /**
