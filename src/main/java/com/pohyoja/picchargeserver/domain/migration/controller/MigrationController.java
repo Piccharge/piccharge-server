@@ -3,7 +3,6 @@ package com.pohyoja.picchargeserver.domain.migration.controller;
 import com.pohyoja.picchargeserver.common.BaseResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyIdResponse;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyResponse;
-import com.pohyoja.picchargeserver.domain.family.dto.response.InviteCodeResponse;
 import com.pohyoja.picchargeserver.domain.family.service.FamilyService;
 import com.pohyoja.picchargeserver.domain.member.dto.MemberDTO;
 import com.pohyoja.picchargeserver.domain.migration.dto.request.JoinFamilyRequest;
@@ -18,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,17 +55,11 @@ public class MigrationController {
 
 
     // 3. 가족 및 초대 코드 생성
-    @PutMapping("/migrations/create-family")
+    @PostMapping("/migrations/create-family")
     public BaseResponse<FamilyCreateResponse> createFamily(
             @RequestBody MemberIdRequest memberIdRequest
     ) {
-        FamilyResponse familyResponse = familyService.createFamily(memberIdRequest.memberId());
-        InviteCodeResponse inviteCodeResponse = familyService.createInviteCode(familyResponse.id(),
-                memberIdRequest.memberId());
-        return BaseResponse.onSuccess(new FamilyCreateResponse(
-                familyResponse.id(),
-                inviteCodeResponse.code())
-        );
+        return BaseResponse.onSuccess(migrationService.createFamily(memberIdRequest.memberId()));
     }
 
     // 4. 가족 참여

@@ -2,6 +2,8 @@ package com.pohyoja.picchargeserver.domain.migration.service;
 
 import com.pohyoja.picchargeserver.common.exception.CustomException;
 import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyIdResponse;
+import com.pohyoja.picchargeserver.domain.family.dto.response.FamilyResponse;
+import com.pohyoja.picchargeserver.domain.family.dto.response.InviteCodeResponse;
 import com.pohyoja.picchargeserver.domain.family.entity.Family;
 import com.pohyoja.picchargeserver.domain.family.exception.FamilyCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.family.repository.FamilyRepository;
@@ -12,6 +14,7 @@ import com.pohyoja.picchargeserver.domain.member.exception.MemberCustomErrorCode
 import com.pohyoja.picchargeserver.domain.member.repository.MemberRepository;
 import com.pohyoja.picchargeserver.domain.member.service.MemberService;
 import com.pohyoja.picchargeserver.domain.migration.dto.request.PhotoMigrateRequest;
+import com.pohyoja.picchargeserver.domain.migration.dto.response.FamilyCreateResponse;
 import com.pohyoja.picchargeserver.domain.photo.dto.PhotoDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.request.PhotoAddRequest;
 import com.pohyoja.picchargeserver.domain.photo.entity.Photo;
@@ -85,6 +88,15 @@ public class MigrationService {
                 photoMigrateRequest.uploadDate()
         ).orElseThrow(() -> new CustomException(PhotoCustomErrorCode.PHOTO_UPLOAD_FAILED));
         return PhotoDTO.of(savedPhoto);
+    }
+
+    /**
+     * 가족 생성
+     */
+    public FamilyCreateResponse createFamily(String memberId) {
+        FamilyResponse familyResponse = familyService.createFamily(memberId);
+        InviteCodeResponse inviteCodeResponse = familyService.createInviteCode(familyResponse.id(), memberId);
+        return new FamilyCreateResponse(familyResponse.id(), inviteCodeResponse.code());
     }
 
     private void validateUrl(String photoUrl) {
