@@ -20,7 +20,8 @@ public enum PhotoCustomErrorCode implements CustomErrorCodeInterface {
     REMOTE_STORAGE_ERROR("PHOTO009", "원격 스토리지 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR),
     FILE_SIZE_EXCEEDED("PHOTO010", "파일 크기 제한을 초과했습니다", HttpStatus.PAYLOAD_TOO_LARGE),
     UNSUPPORTED_FILE_FORMAT("PHOTO011", "지원하지 않는 파일 형식입니다", HttpStatus.BAD_REQUEST),
-    INVALID_PAGE_SIZE("PHOTO012", "유효하지 않은 페이지 크기입니다", HttpStatus.BAD_REQUEST);
+    INVALID_PAGE_SIZE("PHOTO012", "유효하지 않은 페이지 크기입니다", HttpStatus.BAD_REQUEST),
+    INVALID_PHOTO_URL("PHOTO013", "유효하지 않은 사진 URL입니다", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
