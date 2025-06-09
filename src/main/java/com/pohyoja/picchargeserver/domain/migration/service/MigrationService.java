@@ -22,6 +22,7 @@ import com.pohyoja.picchargeserver.domain.photo.entity.Reaction;
 import com.pohyoja.picchargeserver.domain.photo.exception.PhotoCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.photo.repository.PhotoRepository;
 import com.pohyoja.picchargeserver.domain.photo.service.PhotoService;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,6 +58,13 @@ public class MigrationService {
      */
     public FamilyIdResponse getCurrentFamily(String memberId) {
         return familyService.getCurrentFamily(memberId);
+    }
+
+    /**
+     * 중복 사진 조회
+     */
+    public boolean existsSamePhoto(Long familyId, String uploadMemberId, LocalDateTime targetTime) {
+        return photoRepository.existsSamePhoto(familyId, uploadMemberId, targetTime) == 1;
     }
 
     /**

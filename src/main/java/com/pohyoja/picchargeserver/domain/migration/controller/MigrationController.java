@@ -13,6 +13,7 @@ import com.pohyoja.picchargeserver.domain.migration.dto.response.FamilyCreateRes
 import com.pohyoja.picchargeserver.domain.migration.service.MigrationService;
 import com.pohyoja.picchargeserver.domain.photo.dto.PhotoDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.request.PhotoAddRequest;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,7 +74,21 @@ public class MigrationController {
         ));
     }
 
-    // 5. 사진 업로드
+    // 5. 중복 사진 조회
+    @GetMapping("/migrations/duplicate-photo/{familyId}/{uploadMemberId}/{targetTime}")
+    public BaseResponse<Boolean> existsSamePhoto(
+            @PathVariable Long familyId,
+            @PathVariable String uploadMemberId,
+            @PathVariable LocalDateTime targetTime
+    ) {
+        return BaseResponse.onSuccess(migrationService.existsSamePhoto(
+                familyId,
+                uploadMemberId,
+                targetTime
+        ));
+    }
+
+    // 6. 사진 업로드
     @PutMapping("/migrations/migrate-photo")
     public BaseResponse<PhotoDTO> migratePhoto(
             @RequestBody PhotoMigrateRequest photoMigrateRequest

@@ -24,4 +24,18 @@ public interface PhotoRepository extends JpaRepository<Photo, UUID> {
     void updatePhotoCreatedAndUpdatedAt(@Param("photoId") UUID photoId,
                                         @Param("createdAt") LocalDateTime createdAt,
                                         @Param("updatedAt") LocalDateTime updatedAt);
+
+    @Query(value = """
+            SELECT EXISTS (
+                SELECT 1 FROM photo
+                WHERE family_id = :familyId
+                  AND upload_member_id = :uploadMemberId
+                  AND ABS(TIMESTAMPDIFF(SECOND, created_at, :targetTime)) <= 1
+            )
+            """, nativeQuery = true)
+    Integer existsSamePhoto(
+            @Param("familyId") Long familyId,
+            @Param("uploadMemberId") String uploadMemberId,
+            @Param("targetTime") LocalDateTime targetTime
+    );
 }
