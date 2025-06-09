@@ -14,8 +14,10 @@ import com.pohyoja.picchargeserver.domain.migration.service.MigrationService;
 import com.pohyoja.picchargeserver.domain.photo.dto.PhotoDTO;
 import com.pohyoja.picchargeserver.domain.photo.dto.request.PhotoAddRequest;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -99,5 +101,24 @@ public class MigrationController {
                         photoMigrateRequest.id(),
                         photoMigrateRequest.url()
                 )));
+    }
+
+    // 7. 사진 삭제
+    @DeleteMapping("/migrations/delete-photo/{memberId}/{photoId}")
+    public BaseResponse<Void> deletePhoto(
+            @PathVariable String memberId,
+            @PathVariable UUID photoId
+    ) {
+        migrationService.deletePhoto(memberId, photoId);
+        return BaseResponse.onSuccess(null);
+    }
+
+    // 8. 유저 삭제
+    @DeleteMapping("/migrations/delete-user/{memberId}")
+    public BaseResponse<Void> deleteUser(
+            @PathVariable String memberId
+    ) {
+        migrationService.deleteUser(memberId);
+        return BaseResponse.onSuccess(null);
     }
 }

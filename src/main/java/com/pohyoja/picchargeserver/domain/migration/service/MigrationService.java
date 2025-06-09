@@ -23,6 +23,7 @@ import com.pohyoja.picchargeserver.domain.photo.exception.PhotoCustomErrorCode;
 import com.pohyoja.picchargeserver.domain.photo.repository.PhotoRepository;
 import com.pohyoja.picchargeserver.domain.photo.service.PhotoService;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -125,24 +126,30 @@ public class MigrationService {
     }
 
     /**
-     * 가족 ID로 가족 조회
+     * 사진 삭제
      */
+    public void deletePhoto(String memberId, UUID photoId) {
+        Member member = findMemberById(memberId);
+        photoService.deletePhoto(member.getFamily().getId(), photoId, memberId);
+    }
+
+    /**
+     * 유저 삭제
+     */
+    public void deleteUser(String memberId) {
+        memberService.deleteMember(memberId);
+    }
+
     private Family findFamilyById(Long familyId) {
         return familyRepository.findById(familyId)
                 .orElseThrow(() -> new CustomException(FamilyCustomErrorCode.FAMILY_NOT_FOUND));
     }
 
-    /**
-     * 멤버 ID로 멤버 조회
-     */
     private Member findMemberById(String memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomException(MemberCustomErrorCode.MEMBER_ID_NOT_FOUND));
     }
 
-    /**
-     * 가족 구성원 여부 확인
-     */
     private void validateFamilyMember(Family family, Member member) {
         if (member.getFamily() != family) {
             throw new CustomException(FamilyCustomErrorCode.NOT_FAMILY_MEMBER);
