@@ -58,7 +58,6 @@ public class FirebasePhotoService {
             log.info("Successfully created photo document in Firebase for photoId: {}", photoId);
         } catch (Exception e) {
             log.error("Failed to create photo document in Firebase for photoId: {}", photoId, e);
-            throw new RuntimeException("Failed to create photo document in Firebase", e);
         }
     }
 
@@ -79,7 +78,6 @@ public class FirebasePhotoService {
             log.info("Successfully deleted photo document in Firebase for photoId: {}", photoId);
         } catch (Exception e) {
             log.error("Failed to delete photo document in Firebase for photoId: {}", photoId, e);
-            throw new RuntimeException("Failed to delete photo document in Firebase", e);
         }
     }
 }
