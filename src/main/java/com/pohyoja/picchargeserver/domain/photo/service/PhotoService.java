@@ -44,6 +44,7 @@ public class PhotoService {
     private final MemberRepository memberRepository;
     private final PhotoRepository photoRepository;
     private final FileService fileService;
+    private final FirebasePhotoService firebasePhotoService;
 
     /**
      * 가족의 최신 사진 조회
@@ -126,6 +127,17 @@ public class PhotoService {
         photoRepository.save(photo);
         familyRepository.save(family);
 
+        // Firebase에 사진 문서 생성
+        List<String> sharedWith = family.getMembers().stream()
+            .map(Member::getName)
+            .toList();
+        firebasePhotoService.createPhotoDocument(
+            request.id().toString(),
+            member.getName(),
+            request.url(),
+            sharedWith
+        );
+
         return new PhotoDTO(
                 request.id(),
                 member.getName(),
@@ -151,6 +163,9 @@ public class PhotoService {
         photo.clearAssociations();
         photoRepository.delete(photo);
         fileService.deleteImageFromS3(photoId.toString());
+
+        // Firebase에서 사진 문서 삭제
+        firebasePhotoService.deletePhotoDocument(photoId.toString());
     }
 
     private Photo findPhotoById(UUID photoId) {
