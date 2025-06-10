@@ -140,6 +140,47 @@ public class MigrationService {
         memberService.deleteMember(memberId);
     }
 
+    /**
+     * 사진 반응 덮어쓰기
+     */
+    public void overwriteReaction(PhotoMigrateRequest photoMigrateRequest) {
+        Member member = findMemberById(photoMigrateRequest.memberId());
+        Family family = findFamilyById(photoMigrateRequest.familyId());
+        validateFamilyMember(family, member);
+
+        Photo photo = findPhotoById(photoMigrateRequest.id());
+
+        Reaction reaction = photo.getReaction();
+        validateReactionCounts(
+                photoMigrateRequest.love(),
+                photoMigrateRequest.fire(),
+                photoMigrateRequest.star(),
+                photoMigrateRequest.like(),
+                reaction
+        );
+
+        reaction.overwrite(
+                photoMigrateRequest.love(),
+                photoMigrateRequest.fire(),
+                photoMigrateRequest.star(),
+                photoMigrateRequest.like()
+        );
+
+        photoRepository.save(photo);
+    }
+
+    private void validateReactionCounts(int newLove, int newFire, int newStar, int newLike, Reaction reaction) {
+        if (newLove < 0 || newFire < 0 ||
+                newStar < 0 || newLike < 0) {
+            throw new CustomException(PhotoCustomErrorCode.INVALID_REACTION_COUNT);
+        }
+
+        if (reaction.getLoveCount() > newLove || reaction.getFireCount() > newFire ||
+                reaction.getStarCount() > newStar || reaction.getLikeCount() > newLike) {
+            throw new CustomException(PhotoCustomErrorCode.INVALID_REACTION_COUNT);
+        }
+    }
+
     private Family findFamilyById(Long familyId) {
         return familyRepository.findById(familyId)
                 .orElseThrow(() -> new CustomException(FamilyCustomErrorCode.FAMILY_NOT_FOUND));
@@ -154,5 +195,10 @@ public class MigrationService {
         if (member.getFamily() != family) {
             throw new CustomException(FamilyCustomErrorCode.NOT_FAMILY_MEMBER);
         }
+    }
+
+    private Photo findPhotoById(UUID photoId) {
+        return photoRepository.findById(photoId)
+                .orElseThrow(() -> new CustomException(PhotoCustomErrorCode.PHOTO_NOT_FOUND));
     }
 }

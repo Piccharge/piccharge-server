@@ -28,4 +28,11 @@ public class Reaction {
     public void incrementLike(int count) {
         this.likeCount += count;
     }
+
+    public void overwrite(int loveCount, int fireCount, int starCount, int likeCount) {
+        this.loveCount = loveCount;
+        this.fireCount = fireCount;
+        this.starCount = starCount;
+        this.likeCount = likeCount;
+    }
 }

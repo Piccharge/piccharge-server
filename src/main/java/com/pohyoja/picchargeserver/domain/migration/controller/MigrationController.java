@@ -121,4 +121,13 @@ public class MigrationController {
         migrationService.deleteUser(memberId);
         return BaseResponse.onSuccess(null);
     }
+
+    // 9. 감정 표현 덮어쓰기
+    @PostMapping("/migrations/overwrite-reaction")
+    public BaseResponse<Void> overwriteReaction(
+            @RequestBody PhotoMigrateRequest photoMigrateRequest
+    ) {
+        migrationService.overwriteReaction(photoMigrateRequest);
+        return BaseResponse.onSuccess(null);
+    }
 }
