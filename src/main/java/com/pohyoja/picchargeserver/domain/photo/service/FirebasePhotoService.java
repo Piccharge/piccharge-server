@@ -10,6 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,6 +27,7 @@ public class FirebasePhotoService {
     @Value("${firebase.functions.delete-photo-url}")
     private String deletePhotoUrl;
 
+    @Async
     public void createPhotoDocument(String photoId, String uploadBy, String urlString, List<String> sharedWith) {
         Map<String, Integer> reactions = Map.of(
                 "love", 0,
@@ -60,6 +62,7 @@ public class FirebasePhotoService {
         }
     }
 
+    @Async
     public void deletePhotoDocument(String photoId) {
         String url = deletePhotoUrl + "?photoId=" + photoId;
 
