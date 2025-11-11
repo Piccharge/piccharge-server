@@ -1,0 +1,47 @@
+services:
+  piccharge-server:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      MYSQL_ROOT_PASSWORD: ${MYSQL_RDS_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_BUCKET: ${AWS_BUCKET}
+
+
+    depends_on:
+      db-server:
+        condition: service_healthy
+  #      cache-server:
+  #        condition: service_healthy
+
+  db-server:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_RDS_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_HOST: '%'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping" ]
+      interval: 5s
+      retries: 10
+
+#  cache-server:
+#    image: redis
+#    ports:
+#      - "6379:6379"
+#    healthcheck:
+#      test: ["CMD", "redis-cli", "ping"]
+#      interval: 5s
+#      retries: 10
+
+volumes:
+  mysql-data:
+    driver: local

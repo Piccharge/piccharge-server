@@ -1,5 +1,8 @@
 # Custom
 
+/src/main/resources/piccharge*.json
+
+
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,visualstudiocode,git,windows,macos,maven,gradle
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,visualstudiocode,git,windows,macos,maven,gradle
 
