@@ -6,8 +6,13 @@
 
 픽-챠의 백엔드 서버 코드 저장소입니다.
 
-시연 영상, 앱 소개 등은 [해당 레파지토리](https://github.com/DeveloperAcademy-POSTECH/2024-MC2-M09-PoHyoja)를 참고해주세요.
+IOS 코드와 쇼케이스 영상 등 자세한 앱 소개는 [해당 레파지토리](https://github.com/DeveloperAcademy-POSTECH/2024-MC2-M09-PoHyoja)를 참고해주세요.
 
-# 아키텍쳐
+## 📱시연 영상
+
+https://github.com/user-attachments/assets/1bf3401c-597a-41a1-bbd6-7bc68a327e82
+
+## 아키텍쳐
 
 <img width="1212" alt="image" src="https://github.com/user-attachments/assets/c3bc60f3-0b9e-4cbe-a1f4-ab40945903a0" />
+
