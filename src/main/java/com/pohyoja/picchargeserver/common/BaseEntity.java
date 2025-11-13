@@ -20,9 +20,4 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(nullable = false)
     private LocalDateTime updatedAt;
-
-    protected void setTimesForMigration(LocalDateTime uploadDate) {
-        this.createdAt = uploadDate;
-        this.updatedAt = uploadDate;
-    }
 }

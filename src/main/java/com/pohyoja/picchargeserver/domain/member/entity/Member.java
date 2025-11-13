@@ -14,6 +14,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -26,16 +29,24 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
-    @Id @Column(name = "member_id")
+    @Id
+    @Column(name = "member_id", length = 28)
+    @Size(min = 28, max = 28)
     private String uid;
 
-    @Column(unique = true) // 마이그레이션 이전 로직 유지
+    @NotBlank
+    @Column(unique = true, nullable = false) // 마이그레이션 이전 로직 유지
     private String name;
 
+    @NotBlank
+    @Email
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private int uploadCycle = 3;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 

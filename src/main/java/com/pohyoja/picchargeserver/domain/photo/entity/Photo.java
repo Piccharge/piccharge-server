@@ -9,24 +9,30 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
 @Entity
-@Table(name = "photo")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "photo", indexes = {
+        @Index(name = "idx_photo_family_created_at", columnList = "family_id, created_at DESC")
+})
 public class Photo extends BaseEntity {
     @Id @Column(name = "photo_id")
     private UUID id;
 
-    @Column(nullable = false)
+    @NotBlank
+    @URL
+    @Column(nullable = false, unique = true)
     private String url;
 
     @Embedded
@@ -74,9 +80,5 @@ public class Photo extends BaseEntity {
     public void clearAssociations() {
         setFamily(null);
         setUploadMember(null);
-    }
-
-    public void setCustomDatesForMigration(LocalDateTime uploadDate) {
-        setTimesForMigration(uploadDate);
     }
 }
